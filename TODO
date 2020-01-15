@@ -1,0 +1,15 @@
+- README.md
+- distribution identification
+- first run script
+
+- add more DE
+
+- better way to identify screen resolution
+- use screen resolution to select image
+- multimonitor
+
+- use only one provider of POTD
+- DB for image information (url, author, description, ...)
+
+- for version X, use a dlna server (it is possible?)
+

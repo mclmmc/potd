@@ -1,0 +1,43 @@
+#!/usr/bin/bash
+#----------------------------------------------------------------------------#
+#  Name           potd_nasa                                                  #
+#                                                                            #
+#  Description    Get daily picture from apod.nasa.gov/apod/astropix.html    #
+#                 using Nasa api                                             #
+#                 (https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY)     #
+#                                                                            #
+#  Input          file to use as backgound                                   #
+#----------------------------------------------------------------------------#
+
+function potd_nasa()
+{
+	local __wall=$1
+	local potd=$(mktemp /tmp/potd.XXXXXXXX)
+	local -r nasa_key="DEMO_KEY"
+	local -r nasa_url="https://api.nasa.gov/planetary/apod?api_key=${nasa_key}"
+	local nasa_type=""
+	local nasa_img=""
+	local apiResp=""
+	local -i ret=1
+
+	# Fetching API response.
+	apiResp=$(curl --silent $nasa_url)
+	if [ $? -gt 0 ]; then
+		notify-send "Cannot connect to NASA server!"
+		exit 1
+	fi
+
+	nasa_type=$(echo $apiResp | jq -r .media_type)
+
+	if [ $nasa_type == "image" ]
+	then
+		nasa_img=$(echo $apiResp | jq -r .hdurl)
+		curl --silent --output "$potd" "$nasa_img"
+		ret=$?
+		[ $ret -eq 0 ] && mv "$potd" $__wall || rm "$potd"
+	fi
+
+	echo $ret
+}
+
+[ -v DEBUG ] && potd_nasa potd || potd_nasa "$@"

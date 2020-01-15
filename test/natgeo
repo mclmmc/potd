@@ -1,0 +1,45 @@
+#!/usr/bin/bash
+#----------------------------------------------------------------------------#
+#  Name           potd_natgeo                                                #
+#                                                                            #
+#  Description    Get daily picture from National Geographic                 #
+#                 (ngimagecollection@natgeo.com)                             #
+#                                                                            #
+#                 the image may be selected from January 2009                #
+#                 thru current date.                                         #
+#                 the year and the month are selected randomly               #
+#                                                                            #
+#                 The NatGeo answer is a json file cantaining all images     #
+#                 for that year and month.                                   #
+#                                                                            #
+#                 The image is randomly selected.                            #
+#                                                                            #
+#                 From January 2017 the yourShot key allow to select         #
+#                 the image resolution                                       #
+#                                                                            #
+#  Input          file to use as backgound                                   #
+#----------------------------------------------------------------------------#
+
+function potd_natgeo()
+{
+	local __wall=$1
+	local potd=$(mktemp /tmp/potd.XXXXXXXX)
+	local NG_URL="https://www.nationalgeographic.com/photography/photo-of-the-day/_jcr_content/.gallery"
+	local ng_uri=""
+	local ng_json=""
+	local json_strings=""
+	local jqcmd=""
+	local jqs=""
+
+	json_string=$(curl -s $NG_URL.json)
+	ng_json=$(echo $json_string | jq .items[0].image)
+	ng_uri=$(echo $ng_json | jq .uri | sed -e 's/"//g')
+
+# 	curl --silent --output "$potd" $(echo $ng_uri | sed -e 's/"//g')
+ 	curl --silent --output "$potd" $ng_uri
+	ret=$?
+	[ $ret -eq 0 ] && mv "$potd" $__wall || rm "$potd"
+	echo $ret
+}
+
+[ -v DEBUG ] && potd_natgeo potd || potd_natgeo "$@"

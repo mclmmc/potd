@@ -1,0 +1,24 @@
+#!/usr/bin/bash
+#----------------------------------------------------------------------------#
+#  Name            potd_local                                                #
+#                                                                            #
+#  Description     select image from local directory                         #
+#                                                                            #
+#  Input           file to use as backgound                                  #
+#                                                                            #
+#----------------------------------------------------------------------------#
+
+function potd_local()
+{
+	local potd=$1
+	local img=""
+	local img_dir=""
+
+	img_dir="${POTD_LOCAL_DIR:-$(xdg-user-dir PICTURES)/potd.d}"
+
+	img="$(ls $img_dir | shuf -n 1)"
+	cp "$img_dir/$img" "$potd"
+	echo 0
+}
+
+[ -v DEBUG ] && potd_local potd || potd_local "$@"

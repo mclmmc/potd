@@ -1,0 +1,25 @@
+For user only:
+
+copy bin/potd $HOME/bin
+               add $HOME/bin to your PATH variable
+
+define the following environment variable
+
+POTD_LOCAL_USR	: local folder for personal potd provider
+                  default $XDG_DATA_HOME/potd
+                  see https://specifications.freedesktop.org/basedir-spec/0.6/ar01s03.html
+POTD_LOCAL_DIR	: local folder for the image collection
+		  default: $(xdg-user-dir PICTURES)/potd.d
+
+copy provider/* under $POTD_LOCAL_USR/provider
+
+
+for system wide usage
+
+copy bin/potd in /opt/bin
+copy provider/* in /opt/shar/potd/provider
+
+common action
+
+copy icons/potd.png /opt/share/pixmaps
+

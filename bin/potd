@@ -1,0 +1,150 @@
+#!/usr/bin/bash
+
+#----------------------------------------------#
+# select color by linux distro. Default "gray" #
+#----------------------------------------------#
+function get_distro_color()
+{
+	local distro=$(lsb_release --id --short)
+	local color=""
+
+	#-------------------------------------------------#
+	# colors grabbed from https://www.schemecolor.com #
+	#-------------------------------------------------#
+	case $distro in
+		 "Fedora") color="#0b57a4" ;;
+		"RedHat*") color="#CC0000" ;;
+		 "CentOS") color="#0b57a4" ;;
+		 "Ubuntu") color="#DD4814" ;;
+		"Kubuntu") color="#0077c4" ;;
+		"Xubuntu") color="#333333" ;;
+		"Lubuntu") color="#003a72" ;;
+		*) color=gray ;;
+	esac
+
+	echo $color
+}
+
+#-------------------------------------------------#
+# get screen resolution for select the best image #
+#                                                 #
+# on my laptop                                    #
+#                                                 #
+# command output                                  #
+# 0: +*eDP-1 1600/344x900/194+0+0  eDP-1          #
+#            ^^^^^^^^^^^^^^^^^^^^                 #
+#            ++++     +++                         #
+#-------------------------------------------------#
+
+function get_resolution()
+{
+	local -a xran=()
+	local x
+	local y
+
+	xran=($(xrandr --listmonitors | grep \*))
+
+	x=$(echo ${xran[2]%x*})
+	x=$(echo ${x%/*})
+
+	y=$(echo ${xran[2]#*x})
+	y=$(echo ${y%/*})
+
+	printf "%sx%s" $x $y
+}
+
+function xfce()
+{
+    local wall=$1
+    local xres
+    xres=($(echo $(xfconf-query --channel xfce4-desktop --list | grep last-image)))
+    for x in "${xres[@]}"
+    do
+      xfconf-query --channel xfce4-desktop --property $x --set $wall
+    done
+}
+
+function gnome()
+{
+    local wall=$1
+
+    gsettings set org.gnome.desktop.background picture-uri "file://$wall"
+    gsettings set org.gnome.desktop.screensaver picture-uri "file://$wall"
+    gsettings set org.gnome.desktop.background picture-options "zoom"
+}
+
+function cinnamon()
+{
+    local wall=$1
+
+    gsettings set org.cinnamon.desktop.background picture-uri "file://$wall"
+    gsettings set org.cinnamon.desktop.background picture-options "zoom"
+    gsettings set org.gnome.desktop.screensaver picture-uri "file://$wall"
+}
+
+function potd_main()
+{
+    local -a provider=()
+    local -i pi=0
+    local -i pix=0
+    local -r -i SUCCESS=0
+    local potd_tmp=$(mktemp --tmpdir=/tmp potd.XXXXXXXX)
+    local POTD_IMAGE="$(xdg-user-dir PICTURES)/potd"
+    local screen="" 
+    local POTD_ICON=/opt/share/pixmaps/potd.png
+
+    POTD_LOCAL_DIR=${POTD_LOCAL_DIR:-$(xdg-user-dir PICTURES)/potd.d}
+    POTD_LOCAL_USR=${POTD_LOCAL_USR:-${XDG_DATA_HOME:-$HOME/.local/shareg/potd}}
+    POTD_SYSTEM=/opt/share/potd
+
+    screen=$(get_resolution)
+
+    #--------------------------------------------------------
+    # potd used for first time
+    #--------------------------------------------------------
+    if [ ! -r $POTD_IMAGE ]
+    then
+	convert -size $screen canvas:$(get_distro_color) /tmp/potd.png
+	mv /tmp/potd.png  $POTD_IMAGE
+        case "$XDG_CURRENT_DESKTOP" in
+                "XFCE") xfce $image ;;
+                "GNOME") gnome $image ;;
+                *) notify-send "$XDG_CURRENT_DESKTOP not supported." ; exit ;;
+        esac
+    fi
+
+#
+    if [ ! -d $POTD_LOCAL_USR ]
+    then
+	mkdir -p $POTD_LOCAL_USR/provider
+    fi
+
+    pi=0 # forcing pi value
+    for svr in $(find $POTD_SYSTEM/provider $POTD_LOCAL_USR/provider -maxdepth 1 -type f 2>/dev/null)
+    do
+	[ -v DEBUG ] && echo $svr
+	provider[$pi]=$svr
+	pi=$(( ++pi ))
+    done
+
+    #------------------------------------
+    # select potd provider
+    #------------------------------------
+
+    pix=$(shuf -n1 -i0-$(( pi - 1 )))
+
+    [ -v DEBUG ] && echo sel: ${provider[$pix]}
+
+    ${provider[$pix]} $potd_tmp $screen
+
+    if [ $? -eq $SUCCESS ]
+    then
+	mv $potd_tmp $POTD_IMAGE
+	[ -v DISPLAY ] && notify-send -i $POTD_ICON "potd: New image from $(basename ${provider[$pix]})"
+    else
+	rm $potd_tmp
+	[ -v DISPLAY ] && notify-send -i $POTD_ICON "potd: Error from $(basename ${provider[$pix]})"
+    fi
+}
+
+potd_main

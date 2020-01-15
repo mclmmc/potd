@@ -1,0 +1,40 @@
+#!/usr/bin/bash
+#----------------------------------------------------------------------------#
+#  Name           potd_natgeo                                                #
+#                                                                            #
+#  Description    Get daily picture from National Geographic                 #
+#                 (ngimagecollection@natgeo.com)                             #
+#                                                                            #
+#                 the image may be selected from January 2009                #
+#                 thru current date.                                         #
+#                 the year and the month are selected randomly               #
+#                                                                            #
+#                 The NatGeo answer is a json file cantaining all images     #
+#                 for that year and month.                                   #
+#                                                                            #
+#                 The image is randomly selected.                            #
+#                                                                            #
+#                 From January 2017 the yourShot key allow to select         #
+#                 the image resolution                                       #
+#                                                                            #
+#  Input          file to use as backgound                                   #
+#----------------------------------------------------------------------------#
+
+function potd_unsplash()
+{
+	local __wall=$1
+	local potd=$(mktemp /tmp/potd.XXXXXXXX)
+	local UN_URL="https://source.unsplash.com/random"
+	local un_res=$2
+
+	[ -v DEBUG ] && echo "unsplash.com"
+
+# curl need --location because unsplash return e redirect page
+  	curl --silent --location --output "$potd" "$UN_URL/$un_res"
+#	wget -O "$potd" "$UN_URL/$un_res"
+	ret=$?
+	[ $ret -eq 0 ] && mv "$potd" $__wall || rm "$potd"
+	echo $ret
+}
+
+[ -v DEBUG ] && potd_unsplash potd 1600x900 || potd_unsplash "$@"
