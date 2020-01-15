@@ -30,9 +30,13 @@ function potd_natgeo()
 	local json_strings=""
 	local jqcmd=""
 	local jqs=""
+	local -i jqe=0
+	local -i jqi=0
 
 	json_string=$(curl -s $NG_URL.json)
-	ng_json=$(echo $json_string | jq .items[0].image)
+	jqe=$(( $(echo $json_string | jq '.items | length') - 1 ))
+	jqi=$(shuf -i0-$jqe -n1)
+	ng_json=$(echo $json_string | jq .items[$jqi].image)
 	ng_uri=$(echo $ng_json | jq .uri | sed -e 's/"//g')
 
 # 	curl --silent --output "$potd" $(echo $ng_uri | sed -e 's/"//g')
