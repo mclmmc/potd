@@ -34,7 +34,8 @@ function potd_unsplash()
 #	wget -O "$potd" "$UN_URL/$un_res"
 	ret=$?
 	[ $ret -eq 0 ] && mv "$potd" $__wall || rm "$potd"
-	echo $ret
+	return $ret
 }
 
 [ -v DEBUG ] && potd_unsplash potd 1600x900 || potd_unsplash "$@"
+exit $?

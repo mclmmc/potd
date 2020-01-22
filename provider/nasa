@@ -37,7 +37,9 @@ function potd_nasa()
 		[ $ret -eq 0 ] && mv "$potd" $__wall || rm "$potd"
 	fi
 
-	echo $ret
+	return $ret
 }
 
 [ -v DEBUG ] && potd_nasa potd || potd_nasa "$@"
+
+exit $?

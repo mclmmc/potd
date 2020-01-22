@@ -43,7 +43,8 @@ function potd_natgeo()
  	curl --silent --output "$potd" $ng_uri
 	ret=$?
 	[ $ret -eq 0 ] && mv "$potd" $__wall || rm "$potd"
-	echo $ret
+	return $ret
 }
 
 [ -v DEBUG ] && potd_natgeo potd || potd_natgeo "$@"
+exit $?
