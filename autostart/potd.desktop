@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Picture of the Day
+GenericName=Potd
+Comment=Potd
+Exec=/usr/bin/systemctl --user start potd.timer
+Terminal=false
+Type=Application
+X-GNOME-Autostart-enabled=true

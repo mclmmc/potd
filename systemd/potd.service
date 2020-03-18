@@ -1,0 +1,6 @@
+[Unit]
+Description=Pictures Of The Day
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c 'DEBUG=1 /home/michele/bin/potd >> /home/michele/POTD.OUT'
