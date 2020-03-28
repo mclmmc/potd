@@ -13,11 +13,15 @@ POTD_LOCAL_DIR	: local folder for the image collection
 
 copy provider/* under $POTD_LOCAL_USR/provider
 
+copy systemd/* under $HOME/.config/systemd/user
+
+copy autostart/* under $HOME/.config/autostart
+
 
 for system wide usage
 
 copy bin/potd in /opt/bin
-copy provider/* in /opt/shar/potd/provider
+copy provider/* in /opt/share/potd/provider
 
 common action
 

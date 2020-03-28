@@ -94,7 +94,7 @@ function potd_main()
     local POTD_ICON=/opt/share/pixmaps/potd.png
 
     POTD_LOCAL_DIR=${POTD_LOCAL_DIR:-$(xdg-user-dir PICTURES)/potd.d}
-    POTD_LOCAL_USR=${POTD_LOCAL_USR:-${XDG_DATA_HOME:-$HOME/.local/shareg/potd}}
+    POTD_LOCAL_USR=${POTD_LOCAL_USR:-${XDG_DATA_HOME:-$HOME/.local/share/potd}}
     POTD_SYSTEM=/opt/share/potd
 
     screen=$(get_resolution)
