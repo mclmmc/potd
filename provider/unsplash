@@ -1,23 +1,14 @@
 #!/usr/bin/bash
 #----------------------------------------------------------------------------#
-#  Name           potd_natgeo                                                #
+#  Name           potd_unsplash                                              #
 #                                                                            #
-#  Description    Get daily picture from National Geographic                 #
-#                 (ngimagecollection@natgeo.com)                             #
+#  Description    Get daily or random picture from unsplash.com              #
+#                 (http://source.unsplash.com/....)                          #
 #                                                                            #
-#                 the image may be selected from January 2009                #
-#                 thru current date.                                         #
-#                 the year and the month are selected randomly               #
+#                 Unsplash return image content an not image uri             #
 #                                                                            #
-#                 The NatGeo answer is a json file cantaining all images     #
-#                 for that year and month.                                   #
-#                                                                            #
-#                 The image is randomly selected.                            #
-#                                                                            #
-#                 From January 2017 the yourShot key allow to select         #
-#                 the image resolution                                       #
-#                                                                            #
-#  Input          file to use as backgound                                   #
+#  Input          $1: file to use as backgound   $2: screen resolution       #
+#                 file to use as backgound                                   #
 #----------------------------------------------------------------------------#
 
 function potd_unsplash()
