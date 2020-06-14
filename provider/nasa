@@ -18,7 +18,7 @@ function potd_nasa()
 	local nasa_type=""
 	local nasa_img=""
 	local apiResp=""
-	local -i ret=0
+	local -i ret=1
 
 	# Fetching API response.
 	apiResp=$(curl --silent $nasa_url)
