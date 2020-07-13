@@ -23,7 +23,7 @@
 function potd_natgeo()
 {
 	local __wall=$1
-	local potd=$(mktemp /tmp/potd.XXXXXXXX)
+	local potd=""
 	local NG_URL="https://www.nationalgeographic.com/photography/photo-of-the-day/_jcr_content/.gallery"
 	local ng_uri=""
 	local ng_json=""
@@ -33,16 +33,17 @@ function potd_natgeo()
 	local -i jqe=0
 	local -i jqi=0
 
+	potd="$(mktemp /tmp/potd.XXXXXXXX)"
 	json_string=$(curl -s $NG_URL.json)
-	jqe=$(( $(echo $json_string | jq '.items | length') - 1 ))
+	jqe=$(( $(echo "$json_string" | jq '.items | length') - 1 ))
 	jqi=$(shuf -i0-$jqe -n1)
-	ng_json=$(echo $json_string | jq .items[$jqi].image)
-	ng_uri=$(echo $ng_json | jq .uri | sed -e 's/"//g')
+	ng_json=$(echo "$json_string" | jq .items[$jqi].image)
+	ng_uri=$(echo "$ng_json" | jq .uri | sed -e 's/"//g')
 
 # 	curl --silent --output "$potd" $(echo $ng_uri | sed -e 's/"//g')
- 	curl --silent --output "$potd" $ng_uri
+ 	curl --silent --output "$potd" "$ng_uri"
 	ret=$?
-	[ $ret -eq 0 ] && mv "$potd" $__wall || rm "$potd"
+	[ $ret -eq 0 ] && mv "$potd" "$__wall" || rm "$potd"
 	return $ret
 }
 

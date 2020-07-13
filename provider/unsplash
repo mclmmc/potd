@@ -5,7 +5,7 @@
 #  Description    Get daily or random picture from unsplash.com              #
 #                 (http://source.unsplash.com/....)                          #
 #                                                                            #
-#                 Unsplash return image content an not image uri             #
+#                 Unsplash return image content and not image uri            #
 #                                                                            #
 #  Input          $1: file to use as backgound   $2: screen resolution       #
 #                 file to use as backgound                                   #
@@ -14,7 +14,7 @@
 function potd_unsplash()
 {
 	local __wall=$1
-	local potd=$(mktemp /tmp/potd.XXXXXXXX)
+	local potd=""
 	local UN_URL="https://source.unsplash.com"
 	local un_res=$2
 	local ret=1
@@ -22,15 +22,16 @@ function potd_unsplash()
 
 	[ -v DEBUG ] && echo "unsplash.com"
 
+	potd="$(mktemp /tmp/potd.XXXXXXXX)"
 	case "$(shuf -e random daily -n 1)" in
-		"daily") printf -v url "%s/%s/daily" ${UN_URL} ${un_res} ;;
-		"random") printf -v url "%s/random/%s" ${UN_URL} ${un_res} ;;
+		"daily") printf -v url "%s/%s/daily" "${UN_URL}" "${un_res}" ;;
+		"random") printf -v url "%s/random/%s" "${UN_URL}" "${un_res}" ;;
 	esac
 	[ -v DEBUG ] && echo "$url"
 # curl need --location because unsplash return e redirect page
   	curl --silent --location --output "$potd" "$url"
 	ret=$?
-	[ $ret -eq 0 ] && mv "$potd" $__wall || rm "$potd"
+	[ $ret -eq 0 ] && mv "$potd" "$__wall" || rm "$potd"
 	return $ret
 }
 

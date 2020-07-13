@@ -16,7 +16,7 @@ function potd_local()
 
 	img_dir="${POTD_LOCAL_DIR:-$(xdg-user-dir PICTURES)/potd.d}"
 
-	img="$(ls $img_dir | shuf -n 1)"
+	img="$(ls "$img_dir" | shuf -n 1)"
 	cp "$img_dir/$img" "$potd"
 	echo 0
 }

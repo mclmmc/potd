@@ -11,7 +11,7 @@
 function potd_bing()
 {
 	local __wall=$1
-	local potd=$(mktemp /tmp/potd.XXXXXXXX)
+	local potd=""
 	local -A Bing
 	local reqImg=""
 	local reqImgURL=""
@@ -38,6 +38,7 @@ function potd_bing()
 			       'zh-CN' 'zh-HK' 'zh-TW')
 	local bme=$((${#BING_MARKETS[@]} -1))
 
+	potd="$(mktemp /tmp/potd.XXXXXXXX)"
 	# Base URL.
 	Bing[base]="http://www.bing.com"
 
@@ -68,23 +69,23 @@ function potd_bing()
 	fi
 
 	# Default image URL in case the required is not available.
-	printf -v defImgURL "%s%s" ${Bing[base]} $(echo $apiResp | jq .[$idx].url | sed -e 's/"//g')
+	printf -v defImgURL "%s%s" ${Bing[base]} "$(echo "$apiResp" | jq .[$idx].url | sed -e 's/"//g')"
 
 	# Req image url (raw).
-	printf -v reqImgURL "%s%s" ${Bing[base]} $(echo $apiResp | jq .[$idx].urlbase | sed -e 's/"//g')
+	printf -v reqImgURL "%s%s" ${Bing[base]} "$(echo "$apiResp" | jq .[$idx].urlbase | sed -e 's/"//g')"
 
 	# Checking if reqImgURL exists.
-	curl --silent --output "$potd" --head --fail $reqImgURL
+	curl --silent --output "$potd" --head --fail "$reqImgURL"
 	ret=$?
 
 	if [ $ret -ne 0 ]
 	then
-		curl --silent --output "$potd" $defImgURL
+		curl --silent --output "$potd" "$defImgURL"
 	fi
 
 	ret=$?
 
-	[ $ret -eq 0 ] && mv "$potd" $__wall || rm "$potd"
+	[ $ret -eq 0 ] && mv "$potd" "$__wall" || rm "$potd"
 
 	return $ret
 }
