@@ -140,7 +140,7 @@ function potd_main()
     if [ $? -eq $SUCCESS ]
     then
 	mv $potd_tmp $POTD_IMAGE
-	[ -v DISPLAY ] && notify-send -i $POTD_ICON "potd: New image from $(basename ${provider[$pix]})"
+#	[ -v DISPLAY ] && notify-send -i $POTD_ICON "potd: New image from $(basename ${provider[$pix]})"
     else
 	rm $potd_tmp
 	[ -v DISPLAY ] && notify-send -i $POTD_ICON "potd: Error from $(basename ${provider[$pix]})"
