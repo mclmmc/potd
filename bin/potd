@@ -5,9 +5,10 @@
 #----------------------------------------------#
 function get_distro_color()
 {
-	local distro=$(lsb_release --id --short)
+	local distro=""
 	local color=""
 
+	distro="$(lsb_release --id --short)"
 	#-------------------------------------------------#
 	# colors grabbed from https://www.schemecolor.com #
 	#-------------------------------------------------#
@@ -44,23 +45,23 @@ function get_resolution()
 
 	xran=($(xrandr --listmonitors | grep \*))
 
-	x=$(echo ${xran[2]%x*})
-	x=$(echo ${x%/*})
+	x="${xran[2]%x*}"
+	x="${x%/*}"
 
-	y=$(echo ${xran[2]#*x})
-	y=$(echo ${y%/*})
+	y="${xran[2]#*x}"
+	y="${y%/*}"
 
-	printf "%sx%s" $x $y
+	printf "%sx%s" "$x" "$y"
 }
 
 function xfce()
 {
     local wall=$1
     local xres
-    xres=($(echo $(xfconf-query --channel xfce4-desktop --list | grep last-image)))
+    xres=($(echo "$(xfconf-query --channel xfce4-desktop --list | grep last-image)"))
     for x in "${xres[@]}"
     do
-      xfconf-query --channel xfce4-desktop --property $x --set $wall
+      xfconf-query --channel xfce4-desktop --property "$x" --set "$wall"
     done
 }
 
@@ -88,11 +89,13 @@ function potd_main()
     local -i pi=0
     local -i pix=0
     local -r -i SUCCESS=0
-    local potd_tmp=$(mktemp --tmpdir=/tmp potd.XXXXXXXX)
-    local POTD_IMAGE="$(xdg-user-dir PICTURES)/potd"
+    local potd_tmp=""
+    local POTD_IMAGE=""
     local screen="" 
     local POTD_ICON=/opt/share/pixmaps/potd.png
 
+    potd_tmp="$(mktemp --tmpdir=/tmp potd.XXXXXXXX)"
+    POTD_IMAGE="$(xdg-user-dir PICTURES)/potd"
     POTD_LOCAL_DIR=${POTD_LOCAL_DIR:-$(xdg-user-dir PICTURES)/potd.d}
     POTD_LOCAL_USR=${POTD_LOCAL_USR:-${XDG_DATA_HOME:-$HOME/.local/share/potd}}
     POTD_SYSTEM=/opt/share/potd
@@ -102,28 +105,28 @@ function potd_main()
     #--------------------------------------------------------
     # potd used for first time
     #--------------------------------------------------------
-    if [ ! -r $POTD_IMAGE ]
+    if [ ! -r "$POTD_IMAGE" ]
     then
-	convert -size $screen canvas:$(get_distro_color) /tmp/potd.png
-	mv /tmp/potd.png  $POTD_IMAGE
+	convert -size "$screen" canvas:"$(get_distro_color)" /tmp/potd.png
+	mv /tmp/potd.png  "$POTD_IMAGE"
         case "$XDG_CURRENT_DESKTOP" in
-                "XFCE") xfce $image ;;
-                "GNOME") gnome $image ;;
+                "XFCE") xfce "$image" ;;
+                "GNOME") gnome "$image" ;;
                 *) notify-send "$XDG_CURRENT_DESKTOP not supported." ; exit ;;
         esac
     fi
 
 #
-    if [ ! -d $POTD_LOCAL_USR ]
+    if [ ! -d "$POTD_LOCAL_USR" ]
     then
-	mkdir -p $POTD_LOCAL_USR/provider
+	mkdir -p "$POTD_LOCAL_USR"/provider
     fi
 
     pi=0 # forcing pi value
-    for svr in $(find $POTD_SYSTEM/provider $POTD_LOCAL_USR/provider -maxdepth 1 -type f 2>/dev/null)
+    for svr in $(find $POTD_SYSTEM/provider "$POTD_LOCAL_USR"/provider -maxdepth 1 -type f 2>/dev/null)
     do
-	[ -v DEBUG ] && echo $svr
-	provider[$pi]=$svr
+	[ -v DEBUG ] && echo "$svr"
+	provider[$pi]="$svr"
 	pi=$(( ++pi ))
     done
 
@@ -133,17 +136,17 @@ function potd_main()
 
     pix=$(shuf -n1 -i0-$(( pi - 1 )))
 
-    [ -v DEBUG ] && echo sel: ${provider[$pix]}
+    [ -v DEBUG ] && echo sel: "${provider[$pix]}"
 
-    ${provider[$pix]} $potd_tmp $screen
+    ${provider[$pix]} "$potd_tmp" "$screen"
 
     if [ $? -eq $SUCCESS ]
     then
-	mv $potd_tmp $POTD_IMAGE
+	mv "$potd_tmp" "$POTD_IMAGE"
 #	[ -v DISPLAY ] && notify-send -i $POTD_ICON "potd: New image from $(basename ${provider[$pix]})"
     else
-	rm $potd_tmp
-	[ -v DISPLAY ] && notify-send -i $POTD_ICON "potd: Error from $(basename ${provider[$pix]})"
+	rm "$potd_tmp"
+	[ -v DISPLAY ] && notify-send -i $POTD_ICON "potd: Error from $(basename "${provider[$pix]}")"
     fi
 }
 
